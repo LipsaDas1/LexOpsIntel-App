@@ -1,6 +1,6 @@
 # ⚡ LexOpsIntel // Autonomous Corporate Compliance & Forensic OSINT Engine
 
-### 🔗 Deployed 24/7 Production URL: [INSERT YOUR LIVE GITHUB PAGES URL LINK HERE]
+### 🔗 Deployed 24/7 Production URL: [INSERT YOUR LIVE GITHUB PAGES URL HERE]
 ### 📊 Persistent Cloud Infrastructure: Powered by Supabase Architecture (PostgreSQL)
 
 ---
@@ -12,15 +12,19 @@ Instead of manual security auditing, the suite automates **Open-Source Intellige
 
 ---
 
-## 🌟 Unique Architectural Highlights
+## 🌟 Unique Architectural & UI Highlights
 * **Deterministic Non-Hallucinating Pipeline:** Unlike general generative text systems that are prone to structural hallucinations, the analytical core relies entirely on high-precision client-side fetch lookups and rigorous algorithmic cross-referencing.
+* **Fail-Safe Asynchronous Timeout Guardrails:** Features a programmatic 3-second network fallback loop utilizing `AbortController` signals. This prevents interface freezing when executing threat reconnaissance queries on heavily firewalled corporate domains.
 * **Persistent PostgreSQL Distributed Ledger:** Integrated via private cloud database endpoints to log every target node evaluation, satisfying corporate data compliance retention frameworks.
+* **Premium Cyber-Ops Aesthetics:** Designed with an immersive, hardware-accelerated Matrix code rain background canvas simulation, smooth layout transitions, responsive dashboard scorecards, and glowing neon validation badges.
 * **Zero-Trust Data Protection by Design:** Engineered via a decoupled single-page application framework. Targeted network identifier data executes locally right on the browser edge node without stepping through conversational middleman log trackers, maintaining total alignment with GDPR/DPDPA data minimization rules.
 
 ---
 
 ## 🛠️ Integrated Full-Stack Core Architecture
-[User Browser Node] ➔ Visits 24/7 Public GitHub Pages Deployment URL│├── (1. Asynchronous Fetch)   ➔ Extracts Live Infrastructure Metadata via API├── (2. Relational State Sync)➔ Commits Ledger Rows straight to Remote Cloud PostgreSQL (Supabase)└── (3. Evidence Ingestion)   ➔ Client-Side V8 Document Engine Auto-Generates Certified Brief PDF
+The system functions as a robust, modern serverless cloud infrastructure built for zero operating maintenance costs and 100% public global uptime:
+[User Browser Node] ➔ Visits 24/7 Public GitHub Pages Deployment URL│├── (1. Asynchronous Fetch)   ➔ Extracts Live Infrastructure Metadata via API├── (2. Timeout Interceptor)  ➔ Aborts Stalled Network Handshakes at 3 Seconds├── (3. Relational State Sync)➔ Commits Ledger Rows straight to Remote Cloud PostgreSQL (Supabase)└── (4. Evidence Ingestion)   ➔ Client-Side V8 Document Engine Auto-Generates Certified Brief PDF
+The system functions as a robust, modern serverless cloud infrastructure built for zero operating maintenance costs and 100% public global uptime:
 ## ⚖️ Statutory Legal & GRC Compliance Mapping
 The computational engine processes raw technology telemetry and automatically cross-maps discovered network system perimeter flaws onto active regional and global statutory penalties:
 * **Section 43A, Information Technology Act:** Identifies active identity surfaces that map onto corporate liabilities regarding *Failure to Maintain Reasonable Security Practices*.
@@ -41,14 +45,5 @@ CREATE TABLE forensic_compliance_ledger (
     risk_rating INT NOT NULL,
     statutory_exposure TEXT NOT NULL
 );
-```
 
----
-
-## 💼 Core Technical & Professional Competencies Demonstrated
-Building this platform directly operationalizes high-value competencies listed on my profile:
-1. **Systems & Data Architecture Fluency:** Designing decoupled front-to-back pipelines, handling remote database environments, and embedding external script libraries securely.
-2. **Commercial Awareness & Due Diligence:** The ability to convert raw software engineering parameters into high-level enterprise risk advisory metrics for C-suite executive boards.
-3. **GRC Operational Strategy:** Translating complex global privacy rules into functional code constraints to build concrete software automated frameworks.
-The system functions as a robust, modern serverless cloud infrastructure built for zero operating maintenance costs and 100% public global uptime:
 
