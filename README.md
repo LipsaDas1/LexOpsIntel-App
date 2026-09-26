@@ -61,8 +61,8 @@
 
 <script>
 // FULL-STACK CONNECTIVITY COORDINATES
-const SUPABASE_URL = "PASTE_YOUR_CLEAN_SUPABASE_URL_HERE"; 
-const SUPABASE_KEY = "PASTE_YOUR_LONG_ANON_PUBLIC_KEY_HERE"; 
+const SUPABASE_URL = "https://kzhvpjvnmlsiruxrayyx.supabase.co"; 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aHZwanZubWxzaXJ1eHJheXl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0NDE2MjEsImV4cCI6MjEwNjAxNzYyMX0.h7cWHGdOHVbl0Gaa9_dSjFPmUJ3O4VfWBPp1yYU8d9Q"; 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let activeReport = {};
