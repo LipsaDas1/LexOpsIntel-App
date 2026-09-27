@@ -1,1 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="LexOpsIntel Pro - GRC Compliance and OSINT Assessment Dashboard">
+<title>LexOpsIntel Pro // GRC Compliance Command Center</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<style>
+:root{
+--bg-dark:#030712;--panel-bg:rgba(15,23,42,.58);--card-inner:rgba(30,41,59,.42);
+--accent-cyan:#22d3ee;--accent-blue:#38bdf8;--accent-teal:#14b8a6;
+--accent-magenta:#f43f5e;--accent-yellow:#facc15;--text-primary:#f8fafc;
+--text-secondary:#94a3b8;--text-muted:#64748b;--border:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;font-family:"Plus Jakarta Sans",Arial,sans-serif;color:var(--text-primary);
+background:radial-gradient(circle at 10% 10%,rgba(34,211,238,.07),transparent 30%),radial-gradient(circle at 90% 90%,rgba(20,184,166,.06),transparent 32%),var(--bg-dark);
+display:flex;justify-content:center;align-items:center;padding:30px 15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(80px);opacity:.55}
+.orb-one{width:45vw;height:45vw;min-width:350px;min-height:350px;top:-20%;left:-15%;background:radial-gradient(circle,rgba(34,211,238,.12),transparent 68%);animation:driftOne 18s ease-in-out infinite alternate}
+.orb-two{width:50vw;height:50vw;min-width:350px;min-height:350px;right:-20%;bottom:-25%;background:radial-gradient(circle,rgba(20,184,166,.10),transparent 68%);animation:driftTwo 22s ease-in-out infinite alternate}
+@keyframes driftOne{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(45px,35px,0) scale(1.08)}}
+@keyframes driftTwo{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-40px,-35px,0) scale(1.06)}}
+.console{position:relative;z-index:2;width:100%;max-width:980px;background:linear-gradient(145deg,rgba(15,23,42,.78),rgba(2,6,23,.72));
+border:1px solid var(--border);border-radius:26px;padding:46px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+box-shadow:0 35px 80px rgba(0,0,0,.62),0 0 60px rgba(34,211,238,.16);animation:consoleIn .8s cubic-bezier(.16,1,.3,1) both}
+@keyframes consoleIn{from{opacity:0;transform:translateY(35px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid rgba(34,211,238,.15);background:rgba(34,211,238,.05);color:var(--accent-cyan);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--accent-teal);box-shadow:0 0 12px var(--accent-teal);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{margin:0;font-family:"Space Grotesk",sans-serif;font-size:clamp(27px,4vw,39px);line-height:1.05;letter-spacing:-1.4px}
+h1 span{color:var(--accent-cyan)}
+.subtitle{margin:15px 0 0;max-width:730px;color:var(--text-secondary);font-size:13px;line-height:1.7}
+.search-section{margin-top:34px}
+.input-label{display:block;margin-bottom:9px;color:var(--text-secondary);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.search-rail{display:flex;gap:11px;width:100%}
+.console-input{flex:1;min-width:0;height:55px;padding:0 17px;border-radius:13px;border:1px solid rgba(255,255,255,.08);background:rgba(2,6,23,.72);color:var(--text-primary);outline:none;font-family:"Plus Jakarta Sans",sans-serif;font-size:13px;transition:border-color .25s,box-shadow .25s}
+.console-input::placeholder{color:var(--text-muted)}
+.console-input:focus{border-color:rgba(34,211,238,.5);box-shadow:0 0 0 3px rgba(34,211,238,.08)}
+.audit-button{height:55px;padding:0 24px;border:0;border-radius:13px;color:#03131a;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;transition:transform .2s,box-shadow .2s,opacity .2s}
+.audit-button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(34,211,238,.2)}
+.audit-button:active{transform:translateY(0)}
+.audit-button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.error-box{display:none;margin-top:14px;padding:13px 15px;border-radius:11px;border:1px solid rgba(244,63,94,.22);background:rgba(244,63,94,.08);color:#fb7185;font-size:12px;line-height:1.5}
+.report{display:none;margin-top:35px;padding:32px;border-radius:18px;background:rgba(2,6,23,.44);border:1px solid rgba(255,255,255,.055);border-top:4px solid var(--accent-cyan);animation:reportIn .55s cubic-bezier(.16,1,.3,1) both}
+@keyframes reportIn{from{opacity:0;transform:translateY(-18px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.report-header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:27px}
+.status-label{color:var(--text-muted);font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+#verdictText{margin-top:8px;font-family:"Space Grotesk",sans-serif;font-size:18px;font-weight:700;line-height:1.3}
+.status-chip{padding:7px 10px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;background:rgba(34,211,238,.08);color:var(--accent-cyan);border:1px solid rgba(34,211,238,.16)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.metric-card{padding:21px;min-height:115px;border-radius:13px;background:var(--card-inner);border:1px solid rgba(255,255,255,.045);transition:transform .3s,border-color .3s}
+.metric-card:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.22)}
+.metric-value{margin-top:10px;font-family:"Space Grotesk",sans-serif;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+.score-value{font-size:22px}
+.teal{color:var(--accent-teal);text-shadow:0 0 12px rgba(20,184,166,.28)}
+.magenta{color:var(--accent-magenta);text-shadow:0 0 12px rgba(244,63,94,.28)}
+.yellow{color:var(--accent-yellow);text-shadow:0 0 12px rgba(250,204,21,.22)}
+.evidence-section{margin-top:22px}
+.section-title{margin-bottom:10px;color:var(--text-secondary);font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+.evidence-box{padding:21px;border-radius:13px;background:rgba(2,6,23,.55);border:1px solid rgba(255,255,255,.05);color:#cbd5e1;font-size:13px;line-height:1.75}
+.evidence-box strong{color:var(--text-primary)}
+.audit-details{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}
+.detail{padding:13px 15px;border-radius:10px;background:rgba(15,23,42,.48);border:1px solid rgba(255,255,255,.04)}
+.detail-name{display:block;margin-bottom:5px;color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.detail-value{color:var(--text-secondary);font-size:11px;overflow-wrap:anywhere}
+.download-button{display:none;width:100%;margin-top:20px;padding:14px;border-radius:12px;border:1px solid rgba(34,211,238,.2);background:rgba(34,211,238,.055);color:var(--accent-cyan);font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:background .25s,transform .25s}
+.download-button:hover{background:rgba(34,211,238,.12);transform:translateY(-1px)}
+.footer{margin-top:27px;padding-top:20px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;gap:20px;color:var(--text-muted);font-size:10px;line-height:1.6}
+.footer-right{text-align:right}
+@media(max-width:720px){
+body{align-items:flex-start}.console{margin-top:10px;padding:27px 20px;border-radius:20px}
+.search-rail{flex-direction:column}.audit-button{width:100%}.metrics{grid-template-columns:1fr}
+.audit-details{grid-template-columns:1fr}.report{padding:23px 17px}.report-header{flex-direction:column}.footer{flex-direction:column}.footer-right{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){
+*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+
+<body>
+
+<div class="orb orb-one"></div>
+<div class="orb orb-two"></div>
+
+<main class="console" id="mainConsole">
+
+<div class="eyebrow">
+<span class="pulse"></span>
+Operational Intelligence Layer
+</div>
+
+<h1>
+LexOpsIntel <span>//</span> GRC Command Center
+</h1>
+
+<p class="subtitle">
+Corporate identifier assessment interface for structured compliance triage,
+exposure classification, evidence recording and local forensic report generation.
+</p>
+
+<section class="search-section">
+
+<label class="input-label" for="targetInput">
+Corporate Identifier Vector
+</label>
+
+<div class="search-rail">
+
+<input
+id="targetInput"
+class="console-input"
+type="email"
+autocomplete="off"
+spellcheck="false"
+placeholder="security_ops@company.com"
+maxlength="254"
+>
+
+<button
+type="button"
+class="audit-button"
+id="auditButton"
+>
+Audit Asset
+</button>
+
+</div>
+
+<div id="errorMessage" class="error-box" role="alert"></div>
+
+</section>
+
+<section class="report" id="reportGrid" aria-live="polite">
+
+<div class="report-header">
+
+<div>
+
+<div class="status-label">
+Audit Status
+</div>
+
+<div id="verdictText">
+Awaiting analysis...
+</div>
+
+</div>
+
+<div class="status-chip" id="statusChip">
+Standby
+</div>
+
+</div>
+
+<div class="metrics">
+
+<div class="metric-card">
+
+<div class="status-label">
+Target Node
+</div>
+
+<div class="metric-value" id="outTarget">
+—
+</div>
+
+</div>
+
+<div class="metric-card">
+
+<div class="status-label">
+Domain Host
+</div>
+
+<div class="metric-value" id="outHost">
+—
+</div>
+
+</div>
+
+<div class="metric-card">
+
+<div class="status-label">
+Exposure Index
+</div>
+
+<div class="metric-value score-value" id="outScore">
+—
+</div>
+
+</div>
+
+</div>
+
+<div class="evidence-section">
+
+<div class="section-title">
+Evidentiary Audit Brief
+</div>
+
+<div class="evidence-box" id="outLegal">
+Awaiting audit.
+</div>
+
+</div>
+
+<div class="audit-details">
+
+<div class="detail">
+<span class="detail-name">Assessment Engine</span>
+<span class="detail-value" id="engineStatus">—</span>
+</div>
+
+<div class="detail">
+<span class="detail-name">Assessment Timestamp</span>
+<span class="detail-value" id="auditTimestamp">—</span>
+</div>
+
+<div class="detail">
+<span class="detail-name">Input Classification</span>
+<span class="detail-value" id="inputClassification">—</span>
+</div>
+
+<div class="detail">
+<span class="detail-name">Evidence State</span>
+<span class="detail-value" id="evidenceState">—</span>
+</div>
+
+</div>
+
+<button
+type="button"
+class="download-button"
+id="downloadBtn"
+>
+📥 Download Certified Forensic Report PDF
+</button>
+
+</section>
+
+<footer class="footer">
+
+<div>
+LEXOPSINTEL PRO<br>
+GRC / OSINT / COMPLIANCE INTERFACE
+</div>
+
+<div class="footer-right">
+LOCAL ANALYSIS MODE<br>
+Evidence-based classification only
+</div>
+
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+let activeReport = null;
+let auditRunning = false;
+
+const targetInput = document.getElementById("targetInput");
+const auditButton = document.getElementById("auditButton");
+const reportGrid = document.getElementById("reportGrid");
+const verdictText = document.getElementById("verdictText");
+const statusChip = document.getElementById("statusChip");
+const outTarget = document.getElementById("outTarget");
+const outHost = document.getElementById("outHost");
+const outScore = document.getElementById("outScore");
+const outLegal = document.getElementById("outLegal");
+const errorMessage = document.getElementById("errorMessage");
+const downloadBtn = document.getElementById("downloadBtn");
+const engineStatus = document.getElementById("engineStatus");
+const auditTimestamp = document.getElementById("auditTimestamp");
+const inputClassification = document.getElementById("inputClassification");
+const evidenceState = document.getElementById("evidenceState");
+const mainConsole = document.getElementById("mainConsole");
+
+function isValidEmail(value) {
+    if (
+        typeof value !== "string" ||
+        value.length === 0 ||
+        value.length > 254
+    ) return false;
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function extractDomain(email) {
+    const atIndex = email.lastIndexOf("@");
+    if (atIndex === -1) return "";
+    return email.slice(atIndex + 1).toLowerCase().trim();
+}
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
+}
+
+function clearError() {
+    errorMessage.textContent = "";
+    errorMessage.style.display = "none";
+}
+
+function resetReport() {
+    reportGrid.style.display = "none";
+    downloadBtn.style.display = "none";
+    activeReport = null;
+}
+
+function classifyDomain(domain) {
+
+    const publicProviders = [
+        "gmail.com",
+        "googlemail.com",
+        "yahoo.com",
+        "yahoo.co.in",
+        "hotmail.com",
+        "hotmail.co.uk",
+        "outlook.com",
+        "outlook.in",
+        "live.com",
+        "icloud.com",
+        "proton.me",
+        "protonmail.com",
+        "aol.com"
+    ];
+
+    if (publicProviders.includes(domain)) {
+        return {
+            score: 35,
+            category: "PUBLIC CONSUMER DOMAIN",
+            severity: "MODERATE",
+            cssClass: "yellow",
+            color: "var(--accent-yellow)",
+            explanation:
+                "The supplied identifier uses a public consumer email provider. " +
+                "This is a classification of the domain type only and does not " +
+                "establish account compromise, data exposure, or unlawful conduct."
+        };
+    }
+
+    return {
+        score: 10,
+        category: "CUSTOM / ORGANISATIONAL DOMAIN",
+        severity: "LOW",
+        cssClass: "teal",
+        color: "var(--accent-teal)",
+        explanation:
+            "The supplied identifier uses a domain that is not contained in " +
+            "the local public-provider reference list. A custom domain alone " +
+            "does not establish that the associated infrastructure is secure."
+    };
+}
+
+async function triggerCloudAudit() {
+
+    if (auditRunning) return;
+
+    clearError();
+
+    const target = targetInput.value.trim();
+
+    if (!target) {
+        showError(
+            "VALIDATION FAULT: Enter an email identifier before starting the audit."
+        );
+        targetInput.focus();
+        return;
+    }
+
+    if (!isValidEmail(target)) {
+        showError(
+            "VALIDATION FAULT: Enter a syntactically valid email address."
+        );
+        targetInput.focus();
+        return;
+    }
+
+    auditRunning = true;
+    auditButton.disabled = true;
+    auditButton.textContent = "Auditing...";
+
+    resetReport();
+
+    reportGrid.style.display = "block";
+    reportGrid.style.borderTopColor = "var(--accent-cyan)";
+
+    mainConsole.style.boxShadow =
+        "0 35px 80px rgba(0,0,0,.62), 0 0 60px rgba(34,211,238,.18)";
+
+    verdictText.textContent =
+        "⏳ COMPILING AUDIT TELEMETRY...";
+
+    verdictText.style.color = "var(--text-primary)";
+
+    statusChip.textContent = "Processing";
+    statusChip.style.color = "var(--accent-cyan)";
+    statusChip.style.borderColor = "rgba(34,211,238,.16)";
+    statusChip.style.background = "rgba(34,211,238,.08)";
+
+    engineStatus.textContent =
+        "Local deterministic classification engine";
+
+    evidenceState.textContent =
+        "Awaiting classification";
+
+    const domain = extractDomain(target);
+
+    await new Promise(resolve => setTimeout(resolve, 650));
+
+    try {
+
+        const classification = classifyDomain(domain);
+        const now = new Date();
+        const timestamp = now.toUTCString();
+
+        outTarget.textContent = target;
+        outHost.textContent = domain;
+
+        outScore.innerHTML =
+            `<span class="${classification.cssClass}">
+                ${classification.score}%
+            </span>`;
+
+        outLegal.innerHTML =
+            `<strong>Technical Assessment:</strong>
+            ${classification.explanation}
+
+            <br><br>
+
+            <strong>GRC Compliance Analysis:</strong>
+            The current interface has not independently verified DNS records,
+            MX configuration, breach repositories, threat-intelligence feeds,
+            authentication controls, organisational security controls, or
+            regulatory compliance. Accordingly, no breach, compromise, or
+            statutory violation is asserted from this identifier alone.
+
+            <br><br>
+
+            <strong>Assessment Boundary:</strong>
+            This result is a domain-type triage classification,
+            not a forensic finding or legal determination.`;
+
+        auditTimestamp.textContent = timestamp;
+
+        inputClassification.textContent =
+            classification.category;
+
+        evidenceState.textContent =
+            "Classification generated";
+
+        if (classification.severity === "MODERATE") {
+
+            verdictText.textContent =
+                "🟡 PUBLIC-DOMAIN EXPOSURE CLASSIFICATION";
+
+            verdictText.style.color =
+                "var(--accent-yellow)";
+
+            reportGrid.style.borderTopColor =
+                "var(--accent-yellow)";
+
+            mainConsole.style.boxShadow =
+                "0 35px 80px rgba(0,0,0,.62), 0 0 55px rgba(250,204,21,.12)";
+
+            statusChip.textContent = "Moderate";
+            statusChip.style.color = "var(--accent-yellow)";
+            statusChip.style.borderColor = "rgba(250,204,21,.18)";
+            statusChip.style.background = "rgba(250,204,21,.06)";
+
+        } else {
+
+            verdictText.textContent =
+                "🟢 CUSTOM-DOMAIN TRIAGE CLASSIFICATION";
+
+            verdictText.style.color =
+                "var(--accent-teal)";
+
+            reportGrid.style.borderTopColor =
+                "var(--accent-teal)";
+
+            mainConsole.style.boxShadow =
+                "0 35px 80px rgba(0,0,0,.62), 0 0 55px rgba(20,184,166,.12)";
+
+            statusChip.textContent = "Low";
+            statusChip.style.color = "var(--accent-teal)";
+            statusChip.style.borderColor = "rgba(20,184,166,.18)";
+            statusChip.style.background = "rgba(20,184,166,.06)";
+        }
+
+        activeReport = {
+            target,
+            host: domain,
+            score: classification.score,
+            category: classification.category,
+            severity: classification.severity,
+            timestamp,
+            statement: outLegal.innerText
+        };
+
+        downloadBtn.style.display = "block";
+
+    } catch (error) {
+
+        console.error("Audit execution error:", error);
+
+        showError(
+            "AUDIT ENGINE ERROR: The assessment could not be completed."
+        );
+
+        reportGrid.style.display = "none";
+
+    } finally {
+
+        auditRunning = false;
+        auditButton.disabled = false;
+        auditButton.textContent = "Audit Asset";
+    }
+}
+
+function exportEvidencePDF() {
+
+    if (!activeReport) {
+        showError(
+            "PDF EXPORT FAULT: Complete an audit before generating a report."
+        );
+        return;
+    }
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        showError(
+            "PDF ENGINE FAULT: jsPDF could not be loaded. Check your internet connection and reload the page."
+        );
+        return;
+    }
+
+    try {
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFont("courier", "bold");
+        doc.setFontSize(15);
+
+        doc.text(
+            "LEXOPSINTEL // FORENSIC AUDIT RECORD",
+            15,
+            20
+        );
+
+        doc.line(15, 24, 195, 24);
+
+        doc.setFont("courier", "normal");
+        doc.setFontSize(9);
+
+        doc.text(
+            `Audit Timestamp : ${activeReport.timestamp}`,
+            15,
+            37
+        );
+
+        doc.text(
+            `Target Vector   : ${activeReport.target}`,
+            15,
+            45
+        );
+
+        doc.text(
+            `Domain Host     : ${activeReport.host}`,
+            15,
+            53
+        );
+
+        doc.text(
+            `Classification  : ${activeReport.category}`,
+            15,
+            61
+        );
+
+        doc.text(
+            `Exposure Index  : ${activeReport.score}%`,
+            15,
+            69
+        );
+
+        doc.text(
+            `Severity        : ${activeReport.severity}`,
+            15,
+            77
+        );
+
+        doc.setFont("courier", "bold");
+        doc.text("ASSESSMENT BRIEF", 15, 91);
+
+        doc.setFont("courier", "normal");
+
+        const wrappedText =
+            doc.splitTextToSize(
+                activeReport.statement,
+                175
+            );
+
+        doc.text(wrappedText, 15, 100);
+
+        const disclaimerY =
+            Math.min(
+                245,
+                105 + wrappedText.length * 4.5
+            );
+
+        doc.setFont("courier", "bold");
+        doc.text(
+            "IMPORTANT SCOPE NOTICE",
+            15,
+            disclaimerY
+        );
+
+        doc.setFont("courier", "normal");
+
+        const disclaimer =
+            "This report records a deterministic domain-type " +
+            "triage classification. It does not independently " +
+            "establish compromise, breach, unlawful conduct, " +
+            "or regulatory non-compliance.";
+
+        const wrappedDisclaimer =
+            doc.splitTextToSize(
+                disclaimer,
+                175
+            );
+
+        doc.text(
+            wrappedDisclaimer,
+            15,
+            disclaimerY + 9
+        );
+
+        doc.line(15, 270, 195, 270);
+
+        doc.setFontSize(8);
+
+        doc.text(
+            "LEXOPSINTEL PRO // LOCAL AUDIT RECORD",
+            15,
+            278
+        );
+
+        const safeTarget =
+            activeReport.target.replace(
+                /[^a-zA-Z0-9._@-]/g,
+                "_"
+            );
+
+        doc.save(
+            `LexOpsIntel_Report_${safeTarget}.pdf`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "PDF export error:",
+            error
+        );
+
+        showError(
+            "PDF EXPORT FAULT: The report could not be generated."
+        );
+    }
+}
+
+auditButton.addEventListener(
+    "click",
+    triggerCloudAudit
+);
+
+downloadBtn.addEventListener(
+    "click",
+    exportEvidencePDF
+);
+
+targetInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            triggerCloudAudit();
+        }
+    }
+);
+
+window.addEventListener(
+    "load",
+    function() {
+
+        if (
+            window.jspdf &&
+            window.jspdf.jsPDF
+        ) {
+            console.log(
+                "LexOpsIntel: PDF engine online."
+            );
+        } else {
+            console.warn(
+                "LexOpsIntel: PDF engine unavailable."
+            );
+        }
+
+        console.log(
+            "LexOpsIntel Pro initialized successfully."
+        );
+    }
+);
+</script>
+
+</body>
+</html>
